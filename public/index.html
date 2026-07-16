@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>testX — AI Exploratory Testing</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">tX</div>
+        <div class="brand-copy">
+          <h1>testX</h1>
+          <p>AI-powered exploratory testing</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="status-pill"><span class="dot"></span> OpenAI agent ready</div>
+        <button class="small-btn" id="resetBtn">Reset demo</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-card hero-copy">
+        <div class="eyebrow">OpenAI Build Week Prototype</div>
+        <h2>Test products like a <span>real user.</span></h2>
+        <p>
+          testX turns a product goal into an exploratory test plan, runs realistic user journeys,
+          detects state and usability inconsistencies, and produces evidence-backed bug reports.
+        </p>
+      </div>
+
+      <div class="hero-card hero-stats">
+        <div class="metric">
+          <strong id="journeyMetric">0</strong>
+          <span>User journeys</span>
+        </div>
+        <div class="metric">
+          <strong id="actionMetric">0</strong>
+          <span>Actions observed</span>
+        </div>
+        <div class="metric">
+          <strong id="findingMetric">0</strong>
+          <span>Findings</span>
+        </div>
+        <div class="metric wide">
+          <div>
+            <strong id="qualityLabel">Not tested</strong>
+            <p>Quality score updates after testX completes the exploratory run.</p>
+          </div>
+          <div class="score-ring" id="scoreRing"><b id="scoreValue">—</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <aside class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <div>
+              <h3>Test configuration</h3>
+              <span>Describe the product and desired outcome</span>
+            </div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label for="productName">Product name</label>
+            <input id="productName" value="Tide — Social Notification Experience" />
+          </div>
+
+          <div class="field">
+            <label for="targetUrl">Application URL</label>
+            <input id="targetUrl" value="http://localhost:3000/notifications" />
+          </div>
+
+          <div class="field">
+            <label for="objective">Testing objective</label>
+            <textarea id="objective">Verify that read notifications disappear from the unread list, remain accessible in history, and correctly update counters across the product.</textarea>
+            <div class="helper">testX will convert this into user journeys, acceptance criteria, and regression scenarios.</div>
+          </div>
+
+          <div class="field">
+            <label for="requirements">Known requirements</label>
+            <textarea id="requirements">1. Reading a notification clears its unread state.
+2. Read items remain available in notification history.
+3. Related content can be reopened from the notification.
+4. State remains correct after page refresh.</textarea>
+          </div>
+
+          <div class="button-row">
+            <button class="btn btn-primary" id="generateBtn">Generate AI test plan</button>
+            <button class="btn btn-secondary" id="runBtn" disabled>Run exploratory test</button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-grid">
+        <section class="panel">
+          <div class="steps">
+            <div class="step active" data-step="1"><span class="step-index">1</span><span>Configure</span></div>
+            <div class="step" data-step="2"><span class="step-index">2</span><span>Plan</span></div>
+            <div class="step" data-step="3"><span class="step-index">3</span><span>Explore</span></div>
+            <div class="step" data-step="4"><span class="step-index">4</span><span>Report</span></div>
+          </div>
+
+          <div class="panel-header">
+            <div class="panel-title">
+              <div>
+                <h3>AI test plan</h3>
+                <span id="planSubtitle">Waiting for a testing objective</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-body">
+            <div class="empty-state" id="planEmpty">
+              Enter a product objective, then ask testX to generate a structured exploratory test plan.
+            </div>
+            <div class="plan-list hidden" id="planList"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div>
+                <h3>Live exploratory run</h3>
+                <span id="runSubtitle">No active session</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="run-layout">
+            <div class="browser-frame" id="browserFrame">
+              <div class="browser-top">
+                <div class="window-dots"><i></i><i></i><i></i></div>
+                <div class="address-bar" id="addressBar">http://localhost:3000/notifications</div>
+              </div>
+              <div class="browser-content">
+                <div class="scan-line"></div>
+                <div class="cursor" id="cursor"></div>
+                <div class="demo-app">
+                  <div class="demo-nav">
+                    <div class="demo-logo">Tide</div>
+                    <div class="demo-links"><span>Home</span><span>Messages</span><span>Notifications</span><span>Profile</span></div>
+                  </div>
+                  <div class="demo-card">
+                    <h4>Notifications <span class="badge" id="unreadBadge">2 unread</span></h4>
+                    <p>Signals, replies, and activity from your recent conversations.</p>
+                  </div>
+                  <div class="demo-card" id="notificationCard">
+                    <div class="notification-row" id="rowOne">
+                      <div class="notif-copy">
+                        <strong>You received a new light</strong>
+                        <span>Someone responded to your message · 2 min ago</span>
+                      </div>
+                      <span class="badge">Unread</span>
+                    </div>
+                    <div class="notification-row" id="rowTwo">
+                      <div class="notif-copy">
+                        <strong>Your tide letter was opened</strong>
+                        <span>Continue the conversation · 8 min ago</span>
+                      </div>
+                      <span class="badge">Unread</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="activity-panel">
+              <div class="activity-header">
+                <strong>Agent activity</strong>
+                <span class="live-label" id="liveLabel">Idle</span>
+              </div>
+              <div class="activity-stream" id="activityStream">
+                <div class="empty-state">Agent actions and observations will appear here during the run.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-top"><span id="progressText">Ready</span><span id="progressValue">0%</span></div>
+            <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <div>
+                <h3>Evidence-backed findings</h3>
+                <span id="findingSubtitle">Run a test to generate findings</span>
+              </div>
+            </div>
+            <div class="report-actions">
+              <button class="small-btn" id="copyBtn" disabled>Copy report</button>
+              <button class="small-btn" id="exportBtn" disabled>Export Markdown</button>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="empty-state" id="findingEmpty">
+              testX separates confirmed defects, likely inconsistencies, usability concerns, and open product questions.
+            </div>
+            <div class="findings-grid hidden" id="findingsGrid"></div>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <div class="toast" id="toast">Copied</div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
